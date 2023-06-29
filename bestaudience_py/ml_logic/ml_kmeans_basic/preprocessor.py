@@ -21,7 +21,7 @@ def calcul_anciennete(ma_date):
 def preprocess_data(data):
 
     # Regroupement des données par 'Client - ID' et sélection des premières valeurs
-    data_gb = data.groupby('Client - ID').agg({'Client - Date de Naissance':'first', 'Client - Civilité':'first', 'Client - Mois de Création':'first', 'Commande - Livraison - Pays':'first', 'CA Produits HT':'sum', 'N Commandes':'first'})
+    data_gb = data.groupby('Client - ID').agg({'Client - Date de Naissance':'first', 'Client - Civilité':'first', 'Client - Mois de Création':'first', 'CA Produits HT':'sum', 'N Commandes':'first'})
 
     # Calcul de l'âge à partir de 'Client - Date de Naissance' et suppression de la colonne
     data_gb['age'] = 2023 - data_gb['Client - Date de Naissance'].dt.year
@@ -37,10 +37,6 @@ def preprocess_data(data):
     data_scaled[['CA Produits HT', 'N Commandes', 'age', 'Ancienneté']] = scaler.fit_transform(data_gb[['CA Produits HT', 'N Commandes', 'age', 'Ancienneté']])
 
     ohe = OneHotEncoder(sparse=False)
-
-    ohe.fit(data[['Commande - Livraison - Pays']])
-    data_scaled[ohe.get_feature_names_out()] = ohe.transform(data_gb[['Commande - Livraison - Pays']])
-    data_scaled.drop(columns=["Commande - Livraison - Pays"], inplace=True)
 
     ohe.fit(data[['Client - Civilité']])
     data_scaled[ohe.get_feature_names_out()] = ohe.transform(data_gb[['Client - Civilité']])
