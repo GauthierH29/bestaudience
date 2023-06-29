@@ -5,7 +5,6 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 
-
 def calcul_anciennete(ma_date):
     if pd.isnull(ma_date):  # Handle missing values
         return 0
@@ -18,8 +17,8 @@ def calcul_anciennete(ma_date):
         print(f"Error calculating ancienneté for date {ma_date}: {e}")
         return 0
 
-def preprocess_data(data):
 
+def future_data_processing(data):
     # Regroupement des données par 'Client - ID' et sélection des premières valeurs
     data_gb = data.groupby('Client - ID').agg({'Client - Date de Naissance':'first', 'Client - Civilité':'first', 'Client - Mois de Création':'first', 'CA Produits HT':'sum', 'N Commandes':'first'})
 
@@ -30,6 +29,10 @@ def preprocess_data(data):
     # Calcul de l'ancienneté à partir de 'Client - Mois de Création' et suppression de la colonne
     data_gb['Ancienneté'] = data_gb['Client - Mois de Création'].apply(lambda x: calcul_anciennete(x))
     data_gb.drop('Client - Mois de Création', axis=1, inplace=True)
+
+    return data_gb
+
+def preprocess_data(data_gb):
 
     scaler = StandardScaler()
 
