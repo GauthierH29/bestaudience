@@ -41,7 +41,7 @@ def preprocess_data(data_gb):
 
     ohe = OneHotEncoder(sparse=False)
 
-    ohe.fit(data[['Client - Civilité']])
+    ohe.fit(data_gb[['Client - Civilité']])
     data_scaled[ohe.get_feature_names_out()] = ohe.transform(data_gb[['Client - Civilité']])
     data_scaled.drop(columns=["Client - Civilité"], inplace=True)
 

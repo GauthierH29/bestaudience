@@ -3,12 +3,6 @@ import numpy as np
 import os
 from sklearn.impute import SimpleImputer
 
-current_directory = os.getcwd()
-parent_directory = os.path.dirname(current_directory)
-csv_path = os.path.join(parent_directory, 'raw_data', 'data_base_le_wagon.csv')
-
-data = pd.read_csv(csv_path,sep=';')
-
 
 def cleaning_data(raw_data):
     data_cleaned = raw_data.copy()

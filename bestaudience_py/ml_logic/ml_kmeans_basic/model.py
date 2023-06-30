@@ -2,15 +2,19 @@ import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 import seaborn as sns
+from sklearn.decomposition import PCA
 
 
-def find_optimal_k(data_scaled, max_k=20):
-
+def find_optimal_k(data, max_k, model_type):
     inertia_values = []
     for k in range(1, max_k + 1):
-        kmeans = KMeans(n_clusters=k)
-        kmeans.fit(data_scaled)
-        inertia_values.append(kmeans.inertia_)
+        if model_type == 'kmeans':
+            model = KMeans(n_clusters=k)
+        else:
+            raise ValueError("Le choix du modèle est incorrect. Choisissez 'kmeans'")
+
+        model.fit(data)
+        inertia_values.append(model.inertia_)
 
     diff = np.diff(inertia_values)
     elbow_index = np.argmax(diff) + 1
@@ -18,16 +22,16 @@ def find_optimal_k(data_scaled, max_k=20):
     return optimal_n
 
 
-optimal_n = find_optimal_k(data_scaled, max_k=20)
+def fit_model(model_type, data, optimal_n):
+    if model_type == 'pca':
+        model = PCA()
+    elif model_type == 'kmeans':
+        model = KMeans(n_clusters=optimal_n, n_init=10)
+    else:
+        raise ValueError("Le choix du modèle est incorrect. Choisissez entre 'pca', 'kmeans'")
 
-def create_kmeans(n_clusters=optimal_n, n_init=10):
+    model.fit(data)
+    return model
 
-    kmeans = KMeans(n_clusters=optimal_n, n_init=n_init)
-    return kmeans
-
-def fit_kmeans(kmeans, data_scaled):
-    kmeans.fit(data_scaled)
-    return kmeans
-
-def get_labels(kmeans):
-    return kmeans.labels_
+def model_labels(model):
+    return model.labels_
