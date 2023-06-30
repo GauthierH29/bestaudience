@@ -15,7 +15,7 @@ def get_list_subcategories_unique(df):
     list_subcategories = np.unique(df['Produit - Forme'])
     return list_subcategories
 
-# création des variables :
+# création des variables (à pousser sur le main) :
 
 list_subcategories = get_list_subcategories_unique()
 list_users_unique = get_list_users_unique()
@@ -61,15 +61,28 @@ def get_top_similar_users(user_id, user_item_matrix, top_n=10):
 
 ### Récupération des top produits des top utilisateurs similaires
 
-def top_produtcs_top_similar_users(top_similar_users, user_item_matrix, top_n_products=5):
-    top_products = []
-    for user_id in top_similar_users:
+def top_products_top_similar_users(user_ids, user_item_matrix, list_users_unique, list_subcategories, top_n_similar=10, top_n_products=5):
+    top_products_dict = {}
+    for user_id in user_ids:
         user_index = np.where(list_users_unique == user_id)[0][0]
         user_vector = user_item_matrix[user_index]
-        product_indices = np.argsort(user_vector)[::-1][:top_n_products]
-        top_products.append(list_subcategories[product_indices])
+        similarities = cosine_similarity([user_vector], user_item_matrix)[0]
+        similar_users_indices = similarities.argsort()[::-1][1:top_n_similar+1]
+        similar_users = list_users_unique[similar_users_indices]
 
-    return list(np.unique(top_products))
+        user_top_products = {}
+        for similar_user in similar_users:
+            similar_user_index = np.where(list_users_unique == similar_user)[0][0]
+            similar_user_vector = user_item_matrix[similar_user_index]
+            product_indices = np.argsort(similar_user_vector)[::-1][:top_n_products]
+            top_products = list_subcategories[product_indices]
+            user_top_products[similar_user] = top_products
+
+        top_products_dict[user_id] = user_top_products
+
+    return top_products_dict
+
+
 
 
 ### Récupération des top produits de l'utilisateur sélectionné
