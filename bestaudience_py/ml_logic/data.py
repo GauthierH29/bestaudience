@@ -1,6 +1,6 @@
+import os
 import pandas as pd
 import numpy as np
-import os
 from sklearn.impute import SimpleImputer
 
 
@@ -28,7 +28,7 @@ def cleaning_data(raw_data):
     mean_birth=data_cleaned.groupby('Client - ID')['Client - Date de Naissance'].first()
     mean_birth=pd.DataFrame(mean_birth).reset_index()
     na_mask_date2 = mean_birth['Client - Date de Naissance']!='na'
-    mean_birth_masked = mean_birth[na_mask_date2]
+    mean_birth_masked = mean_birth[na_mask_date2].copy()
     mean_birth_masked['Client - Date de Naissance'] = pd.to_datetime(mean_birth_masked['Client - Date de Naissance'])
 
     mean_birth_masked['age']=mean_birth_masked['Client - Date de Naissance'].dt.year

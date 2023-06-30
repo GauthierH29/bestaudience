@@ -9,7 +9,7 @@ def find_optimal_k(data, max_k, model_type):
     inertia_values = []
     for k in range(1, max_k + 1):
         if model_type == 'kmeans':
-            model = KMeans(n_clusters=k)
+            model = KMeans(n_clusters=k,n_init='auto')
         else:
             raise ValueError("Le choix du modèle est incorrect. Choisissez 'kmeans'")
 
