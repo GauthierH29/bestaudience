@@ -29,6 +29,8 @@ if model_type == 'kmeans':
     optimal_n = find_optimal_k(data_scaled, max_k, model_type)
     model = fit_model(model_type, data_scaled, optimal_n=optimal_n)
     labels = model_labels(model)
+    print(labels)
+    #ajout de la fonction label + df sans scaling
 
 elif model_type == 'pca':
     data_cleaned = data
@@ -36,10 +38,13 @@ elif model_type == 'pca':
     new_data_groupby_cleaned = features_engineering_PCA(data_groupby_cleaned)
     data_preprocessed = preprocessing_for_PCA(new_data_groupby_cleaned)
     optimal_components = find_optimal_threshold(data_preprocessed, variance_threshold=0.90)
+    model_pca = fit_model(model_type, data_preprocessed, optimal_n=None)
     transformed_data = transform_pca(model_type, data_preprocessed, num_components=optimal_components)
     optimal_n = find_optimal_k(transformed_data, max_k, model_type)
-    model = fit_model(model_type, transformed_data, optimal_n=optimal_n)
+    model = fit_model("kmeans", transformed_data, optimal_n=optimal_n)
     labels = model_labels(model)
+    print(labels)
+    #ajout de la fonction label + df sans scaling
 
 else:
     raise ValueError("Le choix du modèle est incorrect. Choisissez 'pca' ou 'kmeans'")
