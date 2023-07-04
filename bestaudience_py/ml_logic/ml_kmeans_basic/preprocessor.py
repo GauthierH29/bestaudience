@@ -39,7 +39,7 @@ def preprocess_data(data_gb):
     data_scaled = data_gb.copy()
     data_scaled[['CA Produits HT', 'N Commandes', 'age', 'Ancienneté']] = scaler.fit_transform(data_gb[['CA Produits HT', 'N Commandes', 'age', 'Ancienneté']])
 
-    ohe = OneHotEncoder(sparse=False)
+    ohe = OneHotEncoder(sparse_output=False)
 
     ohe.fit(data_gb[['Client - Civilité']])
     data_scaled[ohe.get_feature_names_out()] = ohe.transform(data_gb[['Client - Civilité']])
