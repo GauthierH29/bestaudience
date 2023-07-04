@@ -103,6 +103,7 @@ def load_data_to_bq(
     full_table_name = f"{gcp_project}.{bq_dataset}.{table}"
     print(Fore.BLUE + f"\nSave data to BigQuery @ {full_table_name}...:" + Style.RESET_ALL)
 
+    print(data.columns)
     data.columns = [f"_{column}" if not str(column)[0].isalpha() and not str(column)[0] == "_" else str(column) for column in data.columns]
 
     client = bigquery.Client()
