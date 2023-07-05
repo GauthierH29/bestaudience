@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from bestaudience_py.ml_logic.ml_kmeans_basic.registry import load_model
+from bestaudience_py.ml_logic.ml_kmeans_basic.registry import load_model,load_model_from_bucket
+from google.cloud import storage
 from bestaudience_py.params import GCP_PROJECT_ID
 from bestaudience_py.ml_logic.data import cleaning_data, get_data_with_bq, get_data_with_cache
 from bestaudience_py.ml_logic.recommend_sys.recommend_sys import remove_rows_with_slash, get_list_users_unique, get_list_subcategories_unique, passer_colonne_en_index, creation_liste_from_string
@@ -23,9 +24,19 @@ def index():
     return {'ok': True}
 
 
-@app.get('/KMEAN/Predict')
-def KMEAN_predict(user):
-    model = load_model(model_name)
+@app.get('/kmean/Predict')
+def kmean_predict(nb_k):
+    #model = load_model('kmeans',nb_k)
+    model=load_model_from_bucket('kmeans',nb_k)
+    return {'labels':model.labels_.tolist()}
+
+@app.get('/recommend_sys/Predict')
+
+
+@app.get('/kmean_pca/Predict')
+def kmean_pca_predict(nb_K):
+    return #le df concat des labels avec le df cleaned
+           #pour ensuite faire de la data viz sur l'app
 
 
 @app.get('/Recommend/Predict')

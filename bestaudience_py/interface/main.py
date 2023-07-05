@@ -16,7 +16,7 @@ from bestaudience_py.ml_logic.ml_kmeans_basic.preprocessor import future_data_pr
 from bestaudience_py.ml_logic.ml_kmeans_pca.model import find_optimal_threshold, transform_pca
 from bestaudience_py.ml_logic.ml_kmeans_pca.preprocessor import features_engineering_PCA,groupby_client_PCA,preprocessing_for_PCA
 from bestaudience_py.ml_logic.data import cleaning_data
-from bestaudience_py.ml_logic.ml_kmeans_basic.registry import save_model
+from bestaudience_py.ml_logic.ml_kmeans_basic.registry import save_model,save_model_to_bucket
 from bestaudience_py.params import MODEL_TYPE,MAX_K
 
 
@@ -31,14 +31,16 @@ raw_data = pd.read_csv(csv_path,sep=';')
 
 data = cleaning_data(raw_data)  # Complèter avec la fonction pour récupérer les données cleanées
 
-
 def train_kmeans(model_type):
     if model_type == 'kmeans':
         data_gb = future_data_processing(data)
         data_scaled = preprocess_data(data_gb)
         optimal_n = find_optimal_k(data_scaled, MAX_K, model_type)
         model = fit_model(model_type, data_scaled, optimal_n=optimal_n)
-        save_model(model,model_type)
+        #save_model(model,MODEL_TYPE,optimal_n)
+        for i in range(1,11):
+            save_model(model,"kmeans",i)
+            save_model_to_bucket(model,"kmeans",i)
         labels = model_labels(model)
         my_labels=dict()
         my_labels['label']=labels
