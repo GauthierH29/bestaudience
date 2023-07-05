@@ -9,8 +9,8 @@ from sklearn.compose import make_column_transformer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
-from bestaudience_py.ml_logic.recommend_sys import get_list_subcategories_unique, get_list_users_unique, calculate_user_item_matrix
-from bestaudience_py.ml_logic.recommend_sys import get_top_similar_users, top_products_top_similar_users, top_products_user_selected, get_unique_products_for_users
+#from bestaudience_py.ml_logic.recommend_sys import get_list_subcategories_unique, get_list_users_unique, calculate_user_item_matrix
+#from bestaudience_py.ml_logic.recommend_sys import get_top_similar_users, top_products_top_similar_users, top_products_user_selected, get_unique_products_for_users
 from bestaudience_py.ml_logic.ml_kmeans_basic.model import find_optimal_k, fit_model, model_labels
 from bestaudience_py.ml_logic.ml_kmeans_basic.preprocessor import future_data_processing, preprocess_data
 from bestaudience_py.ml_logic.ml_kmeans_pca.model import find_optimal_threshold, transform_pca
@@ -38,15 +38,15 @@ def train_kmeans(model_type):
         optimal_n = find_optimal_k(data_scaled, MAX_K, model_type)
         model = fit_model(model_type, data_scaled, optimal_n=optimal_n)
         #save_model(model,MODEL_TYPE,optimal_n)
-        for i in range(1,11):
-            save_model(model,"kmeans",i)
-            save_model_to_bucket(model,"kmeans",i)
-        labels = model_labels(model)
-        my_labels=dict()
-        my_labels['label']=labels
+        for i in range(1,MAX_K+1):
+            model = fit_model(model_type, data_scaled, optimal_n=i)
+            save_model(model,model_type,i)#a supprimer
+            save_model_to_bucket(model,model_type,i)
+        labels = model_labels(model)#a supprimer
+        my_labels=dict()#a supprimer
+        my_labels['label']=labels#a supprimer
 
-        #print(labels)
-        #ajout de la fonction label + df sans scaling
+
 
     elif model_type == 'pca':
         data_cleaned = data
@@ -58,9 +58,12 @@ def train_kmeans(model_type):
         transformed_data = transform_pca(model_pca, data_preprocessed, num_components=optimal_components)
         optimal_n = find_optimal_k(transformed_data, MAX_K, "kmeans")
         model = fit_model("kmeans", transformed_data, optimal_n=optimal_n)
-        labels = model_labels(model)
-        #print(labels)
-        #ajout de la fonction label + df sans scaling
+        for i in range(1,MAX_K+1):
+            model = fit_model("kmeans", transformed_data, optimal_n=i)
+            save_model(model,model_type,i)#a supprimer
+            save_model_to_bucket(model,model_type,i)
+        labels = model_labels(model)#a supprimer
+
 
     else:
         raise ValueError("Le choix du modèle est incorrect. Choisissez 'pca' ou 'kmeans'")

@@ -147,3 +147,20 @@ def get_data_with_cache(
     print(f"✅ Data loaded, with shape {df.shape}")
 
     return df
+
+def get_data_with_bq(
+        gcp_project:str,
+        query:str
+    ) -> pd.DataFrame:
+    """
+    Retrieve `query` data from BigQuery, or from `cache_path` if the file exists
+    Store at `cache_path` if retrieved from BigQuery for future use
+    """
+    print(Fore.BLUE + "\nLoad data from BigQuery server..." + Style.RESET_ALL)
+    client = bigquery.Client(project=gcp_project)
+    query_job = client.query(query)
+    result = query_job.result()
+    df = result.to_dataframe()
+    print(f"✅ Data loaded, with shape {df.shape}")
+
+    return df
