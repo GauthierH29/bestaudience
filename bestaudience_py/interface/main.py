@@ -31,19 +31,19 @@ raw_data = pd.read_csv(csv_path,sep=';')
 
 data = cleaning_data(raw_data)  # Complèter avec la fonction pour récupérer les données cleanées
 
-
-if MODEL_TYPE == 'kmeans':
-    data_gb = future_data_processing(data)
-    data_scaled = preprocess_data(data_gb)
-    optimal_n = find_optimal_k(data_scaled, MAX_K, MODEL_TYPE)
-    model = fit_model(MODEL_TYPE, data_scaled, optimal_n=optimal_n)
-    #save_model(model,MODEL_TYPE,optimal_n)
-    for i in range(1,11):
-        save_model(model,"kmeans",i)
-        save_model_to_bucket(model,"kmeans",i)
-    labels = model_labels(model)
-    my_labels=dict()
-    my_labels['label']=labels
+def train_kmeans(model_type):
+    if model_type == 'kmeans':
+        data_gb = future_data_processing(data)
+        data_scaled = preprocess_data(data_gb)
+        optimal_n = find_optimal_k(data_scaled, MAX_K, model_type)
+        model = fit_model(model_type, data_scaled, optimal_n=optimal_n)
+        #save_model(model,MODEL_TYPE,optimal_n)
+        for i in range(1,11):
+            save_model(model,"kmeans",i)
+            save_model_to_bucket(model,"kmeans",i)
+        labels = model_labels(model)
+        my_labels=dict()
+        my_labels['label']=labels
 
         #print(labels)
         #ajout de la fonction label + df sans scaling
