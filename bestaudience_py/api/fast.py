@@ -1,11 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from bestaudience_py.ml_logic.ml_kmeans_basic.registry import load_model,load_model_from_bucket
-from google.cloud import storage
+from bestaudience_py.ml_logic.ml_kmeans_basic.registry import load_model_from_bucket
 from bestaudience_py.params import GCP_PROJECT_ID
 from bestaudience_py.ml_logic.data import cleaning_data, get_data_with_bq, get_data_with_cache
 from bestaudience_py.ml_logic.recommend_sys.recommend_sys import remove_rows_with_slash, get_list_users_unique, get_list_subcategories_unique, passer_colonne_en_index, creation_liste_from_string
-from bestaudience_py.ml_logic.recommend_sys.recommend_sys import top_products_top_similar_users, top_products_user_selected, get_unique_products_for_users
+from bestaudience_py.ml_logic.recommend_sys.recommend_sys import get_unique_products_for_users
 from pathlib import Path
 
 app = FastAPI()
@@ -26,7 +25,6 @@ def index():
 
 @app.get('/kmean/Predict')
 def kmean_predict(nb_k):
-    #model = load_model('kmeans',nb_k)
     model=load_model_from_bucket('kmeans',nb_k)
     return {'labels':model.labels_.tolist()}
 
@@ -34,9 +32,9 @@ def kmean_predict(nb_k):
 
 
 @app.get('/kmean_pca/Predict')
-def kmean_pca_predict(nb_K):
-    return #le df concat des labels avec le df cleaned
-           #pour ensuite faire de la data viz sur l'app
+def kmean_pca_predict(nb_k):
+    model=load_model_from_bucket('pca',nb_k)
+    return {'labels':model.labels_.tolist()}
 
 
 @app.get('/Recommend/Predict')
@@ -62,11 +60,7 @@ def process_data(user_ids, top_n_similar, top_n_products):
         user_item_matrix_query
     )
     user_item_matrix = passer_colonne_en_index(new_user_item_matrix, "index")
-    #print(user_item_matrix.head())
 
-    #top_products_top_similar_user = top_products_top_similar_users(user_ids, user_item_matrix, list_users_unique, list_subcategories, top_n_similar, top_n_products)
-    #top_products_user_select = top_products_user_selected(user_ids, user_item_matrix, list_users_unique, list_subcategories, top_n_products)
-    # fonction pour modifier user_ids
     user_ids = creation_liste_from_string(user_ids)
     final_tab = get_unique_products_for_users(user_ids, user_item_matrix, list_users_unique, list_subcategories, int(top_n_similar), int(top_n_products))
 
