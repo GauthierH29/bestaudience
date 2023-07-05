@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.cluster import KMeans
 import seaborn as sns
 from sklearn.decomposition import PCA
-
+from bestaudience_py.ml_logic.ml_kmeans_basic.registry import save_model
 
 def find_optimal_k(data, max_k, model_type):
     inertia_values = []
