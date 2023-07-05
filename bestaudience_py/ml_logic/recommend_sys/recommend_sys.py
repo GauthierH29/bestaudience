@@ -3,7 +3,8 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from bestaudience_py.ml_logic.data import load_data_to_bq
 from bestaudience_py.params import GCP_PROJECT_ID
-from bestaudience_py.ml_logic.data import cleaning_data
+from bestaudience_py.ml_logic.data import cleaning_data, get_data_with_bq
+from pathlib import Path
 
 ### Définir la liste des utilisateurs uniques
 def get_list_users_unique(df):
@@ -132,16 +133,66 @@ def get_unique_products_for_users(user_ids, user_item_matrix, list_users_unique,
 
     return unique_products_dict
 
+def passer_index_en_colonne(df):
+    user_item_matix_without_index = df.copy()
+    user_item_matix_without_index.reset_index(inplace=True)
+    return user_item_matix_without_index
+
+def passer_colonne_en_index(df, name_c):
+    new_user_matrix = df.copy()
+    new_user_matrix.set_index(name_c, inplace=True)
+    return new_user_matrix
+
+### test
+from unidecode import unidecode
+
+def remove_accents(text):
+    return unidecode(text)
+
+def rename_columns(df):
+    new_columns = []
+    for column in df.columns:
+        column = remove_accents(column)
+        column = column.replace(' ', '_')
+        column = column.replace('-', '_')
+        column = column.lower()
+        new_columns.append(column)
+    df.columns = new_columns
+    return df
+
+def creation_liste_from_string(string):
+    test_list = string.split(',')
+    test_list = [test_element.strip() for test_element in test_list]
+    return test_list
+
 if __name__=="__main__":
 
-    user_ids = ['CLT91838', 'CLT32918', 'CLT94868','CLT20208','CLT81083']
+    #user_ids = ['CLT91838', 'CLT32918', 'CLT94868','CLT20208','CLT81083']
+    user_ids = 'CLT91838'
     raw_data = pd.read_csv("raw_data/data_base_le_wagon.csv",sep=";")
     df = cleaning_data(raw_data)
     df = remove_rows_with_slash(df)
+
+    user_item_matrix_table_name = "recommander.user_item_matrix"
+    raw_data_user_matrix = Path("raw_data/user_matrix.csv")
+    user_item_matrix_query = f"SELECT * FROM `{GCP_PROJECT_ID}.{user_item_matrix_table_name}`"
+
     list_users_unique = get_list_users_unique(df)
     list_subcategories = get_list_subcategories_unique(df)
     user_item_matrix = calculate_user_item_matrix(df, list_users_unique, list_subcategories)
-    load_data_to_bq(user_item_matrix,GCP_PROJECT_ID,"recommander","user_item_matrix",truncate=True)
+    print(user_item_matrix)
+    index_user_item_matrix = passer_index_en_colonne(user_item_matrix)
+    index_user_item_matrix = rename_columns(index_user_item_matrix)
+    print(index_user_item_matrix)
+    load_data_to_bq(index_user_item_matrix,GCP_PROJECT_ID,"recommander","user_item_matrix",truncate=True)
+
+    new_user_item_matrix = get_data_with_bq(GCP_PROJECT_ID,
+        user_item_matrix_query
+    )
+    user_item_matrix = passer_colonne_en_index(new_user_item_matrix, "index")
+    print(user_item_matrix)
+    print(user_item_matrix.info())
+
     top_products_top_similar_user = top_products_top_similar_users(user_ids, user_item_matrix, list_users_unique, list_subcategories, top_n_similar=10, top_n_products=5)
     top_products_user_select = top_products_user_selected(user_ids, user_item_matrix, list_users_unique, list_subcategories, top_n_products=5)
     final_tab = get_unique_products_for_users(user_ids, user_item_matrix, list_users_unique, list_subcategories, top_n_similar=10, top_n_products=5)
