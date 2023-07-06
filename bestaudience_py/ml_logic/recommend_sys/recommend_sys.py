@@ -160,6 +160,17 @@ def rename_columns(df):
     df.columns = new_columns
     return df
 
+def rename_columns_2(df):
+    new_columns = []
+    for column in df.columns:
+        column = remove_accents(column)
+        column = column.replace('-', '_')
+        column = column.replace(' ', '')
+        column = column.lower()
+        new_columns.append(column)
+    df.columns = new_columns
+    return df
+
 def creation_liste_from_string(string):
     test_list = string.split(',')
     test_list = [test_element.strip() for test_element in test_list]

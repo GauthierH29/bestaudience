@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from google.cloud import bigquery
 from colorama import Fore, Style
+from bestaudience_py.params import GCP_PROJECT_ID
 
 
 def cleaning_data(raw_data):

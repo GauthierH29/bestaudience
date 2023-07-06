@@ -4,6 +4,9 @@ from dateutil.relativedelta import relativedelta
 from sklearn.preprocessing import MinMaxScaler,RobustScaler,StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import make_column_transformer
+from bestaudience_py.ml_logic.data import load_data_to_bq
+from bestaudience_py.params import GCP_PROJECT_ID
+from bestaudience_py.ml_logic.recommend_sys.recommend_sys import rename_columns
 
 #etapes restantes : importer data cleaned depuis get data dans data.py
 
@@ -52,6 +55,11 @@ def features_engineering_PCA(data_groupby_cleaned):
     #Création de la variable ancienneté (en mois) et drop de la date de création
     new_data_groupby_cleaned['Ancienneté'] = new_data_groupby_cleaned['Client - Mois de Création'].apply(lambda x: calcul_anciennete(x))
     new_data_groupby_cleaned=new_data_groupby_cleaned.drop('Client - Mois de Création',axis=1)
+
+    new_data_groupby_cleaned_rename=new_data_groupby_cleaned.reset_index()
+    new_data_groupby_cleaned_rename = rename_columns(new_data_groupby_cleaned_rename)
+
+    load_data_to_bq(new_data_groupby_cleaned_rename,GCP_PROJECT_ID,"data","kmeans_pca_analyse",truncate=True)
 
     return new_data_groupby_cleaned
 
