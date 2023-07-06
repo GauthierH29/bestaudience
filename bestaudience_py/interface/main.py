@@ -37,7 +37,7 @@ def train_kmeans(model_type):
         data_scaled = preprocess_data(data_gb)
         optimal_n = find_optimal_k(data_scaled, MAX_K, model_type)
         model = fit_model(model_type, data_scaled, optimal_n=optimal_n)
-        #save_model(model,MODEL_TYPE,optimal_n)
+        #save_model(model,MODEL_TYPE,optimal_n) #à supprimer
         for i in range(1,MAX_K+1):
             model = fit_model(model_type, data_scaled, optimal_n=i)
             save_model(model,model_type,i)#a supprimer
@@ -69,4 +69,5 @@ def train_kmeans(model_type):
         raise ValueError("Le choix du modèle est incorrect. Choisissez 'pca' ou 'kmeans'")
 
 if __name__=="__main__":
-    train_kmeans(MODEL_TYPE)
+    train_kmeans("pca")
+    train_kmeans("kmeans")

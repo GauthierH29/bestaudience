@@ -3,7 +3,9 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-
+from bestaudience_py.ml_logic.data import load_data_to_bq
+from bestaudience_py.params import GCP_PROJECT_ID
+from bestaudience_py.ml_logic.recommend_sys.recommend_sys import rename_columns
 
 def calcul_anciennete(ma_date):
     if pd.isnull(ma_date):  # Handle missing values
@@ -29,6 +31,10 @@ def future_data_processing(data):
     # Calcul de l'ancienneté à partir de 'Client - Mois de Création' et suppression de la colonne
     data_gb['Ancienneté'] = data_gb['Client - Mois de Création'].apply(lambda x: calcul_anciennete(x))
     data_gb.drop('Client - Mois de Création', axis=1, inplace=True)
+
+    data_gb_rename=data_gb.reset_index()
+    data_gb_rename = rename_columns(data_gb_rename)
+    load_data_to_bq(data_gb_rename,GCP_PROJECT_ID,"data","kmeans_basics_analyse",truncate=True)
 
     return data_gb
 

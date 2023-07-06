@@ -23,21 +23,19 @@ def index():
     return {'ok': True}
 
 
-@app.get('/kmean/Predict')
+@app.get('/kmean/predict')
 def kmean_predict(nb_k):
     model=load_model_from_bucket('kmeans',nb_k)
     return {'labels':model.labels_.tolist()}
 
-@app.get('/recommend_sys/Predict')
 
-
-@app.get('/kmean_pca/Predict')
+@app.get('/kmean_pca/predict')
 def kmean_pca_predict(nb_k):
     model=load_model_from_bucket('pca',nb_k)
     return {'labels':model.labels_.tolist()}
 
 
-@app.get('/Recommend/Predict')
+@app.get('/recommend/predict')
 def process_data(user_ids, top_n_similar, top_n_products):
     gcp_project = GCP_PROJECT_ID
     raw_data_table_name = "data.raw_data"
