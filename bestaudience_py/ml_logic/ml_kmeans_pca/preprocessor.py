@@ -56,6 +56,7 @@ def features_engineering_PCA(data_groupby_cleaned):
     new_data_groupby_cleaned['Ancienneté'] = new_data_groupby_cleaned['Client - Mois de Création'].apply(lambda x: calcul_anciennete(x))
     new_data_groupby_cleaned=new_data_groupby_cleaned.drop('Client - Mois de Création',axis=1)
 
+    new_data_groupby_cleaned.to_csv('notebook/kmeans_pca_analyse.csv', index=False)
     new_data_groupby_cleaned_rename=new_data_groupby_cleaned.reset_index()
     new_data_groupby_cleaned_rename = rename_columns(new_data_groupby_cleaned_rename)
 
